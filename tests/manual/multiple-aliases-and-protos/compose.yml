@@ -27,4 +27,4 @@ services:
       net1:
       net2:
     labels:
-      - "portalias.80.tcp.udp=8888,7777"
+      - "portalias.80.tcp,udp=8888,7777"

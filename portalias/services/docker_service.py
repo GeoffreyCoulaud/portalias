@@ -37,7 +37,13 @@ class DockerService:
         return container.attrs["NetworkSettings"]["Networks"][network.name]["IPAddress"]
 
     def _get_source_port_from_label(self, label: str) -> tuple[int, list[str]]:
-        _prefix, port, *protocols = label.split(".")
+        parts = label.split(".")
+        port = parts[1]
+        try:
+            protocols_raw = parts[2]
+        except IndexError:
+            protocols_raw = "tcp"
+        protocols = protocols_raw.split(",")
         for protocol in protocols:
             if protocol not in ("tcp", "udp"):
                 raise ValueError(f"Invalid protocol: {protocol}")

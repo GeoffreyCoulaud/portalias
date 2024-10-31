@@ -12,8 +12,7 @@ services:
       context: ../../../
       dockerfile: Dockerfile
     environment:
-      - RULES_ID=test-multiple-protos
-      - DRY_RUN=true
+      - RULES_ID=test-simple-no-dry-run
       - LOG_LEVEL=DEBUG
     cap_add:
       - NET_ADMIN
@@ -27,4 +26,4 @@ services:
       net1:
       net2:
     labels:
-      - "portalias.80.tcp,udp=8888"
+      - "portalias.80=8888"
