@@ -1,0 +1,30 @@
+networks:
+  net1:
+    driver: bridge
+    labels:
+      - "portalias.enabled=true"
+  net2:
+
+services:
+
+  portalias:
+    build:
+      context: ../../../
+      dockerfile: Dockerfile
+    environment:
+      - RULES_ID=test-multiple-aliases
+      - DRY_RUN=true
+      - LOG_LEVEL=DEBUG
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  web:
+    image: httpd
+    networks:
+      net1:
+      net2:
+    labels:
+      - "portalias.80=8888,7777"
