@@ -19,6 +19,6 @@ VOLUME /zones
 
 ENV LOG_LEVEL=DEBUG
 ENV INTERVAL=60
-ENV DNS_TTL=60
+ENV DRY_RUN=false
 
 CMD ["python", "-m", "portalias.main"]

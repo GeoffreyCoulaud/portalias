@@ -48,7 +48,7 @@ class Application:
         self.__docker_service = DockerService()
         self.__iptables_service = IptablesService(
             rules_id=mgetenv("RULES_ID"),
-            dry_run=getenv("DRY_RUN", "true") == "true",
+            dry_run=getenv("DRY_RUN", "false") != "false",
         )
 
     def _loop(self) -> None:

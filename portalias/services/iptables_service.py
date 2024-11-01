@@ -1,42 +1,89 @@
 import logging
+import re
 import subprocess
+from subprocess import CompletedProcess
+from typing import cast
+
 from portalias.models.port_alias import PortAlias
 
 
 class IptablesService:
 
+    __COMMENT_MAX_SIZE: int = 256  # Defined by iptables
+    __COMMENT_PREFIX: str = "portalias."
+
     __rules_id: str
     __dry_run: bool
 
+    def _get_rules_id_max_size(self) -> int:
+        return self.__COMMENT_MAX_SIZE - len(self.__COMMENT_PREFIX)
+
+    def _get_identifying_comment(self) -> str:
+        return f"{self.__COMMENT_PREFIX}{self.__rules_id}"
+
     def __init__(self, rules_id: str, dry_run: bool = True) -> None:
+        if len(rules_id) > (max_size := self._get_rules_id_max_size()):
+            raise ValueError(f"RULES_ID exceeds max size {max_size}")
         self.__rules_id = rules_id
         self.__dry_run = dry_run
 
-    def _get_identifying_comment(self) -> str:
-        return f"portalias.{self.__rules_id}"
+    def _run_command(self, command: list[str]) -> CompletedProcess:
+        result = subprocess.run(
+            args=command,
+            check=False,  # Manual check instead
+            capture_output=True,
+            text=True,
+        )
+        if result.returncode != 0:
+            message_parts = [
+                "Command exited with non-zero code.",
+                "command: %s",
+                "stdout: %s",
+                "stderr: %s",
+            ]
+            logging.error(
+                "\n".join(message_parts),
+                " ".join(command),
+                result.stdout,
+                result.stderr,
+            )
+            raise subprocess.CalledProcessError(
+                returncode=result.returncode,
+                cmd=command,
+                output=result.stdout,
+                stderr=result.stderr,
+            )
+        return result
 
     def _get_all_rule_numbers(self) -> list[PortAlias]:
         """Get all iptables rules handled by portalias"""
         # fmt: off
-        command = ["iptables", "-t", "nat", "-L", "PREROUTING", "--line-numbers", "-n", "-v"] # pylint: disable=line-too-long
+        command = [
+            "iptables", 
+            "-t", "nat", 
+            "-L", "PREROUTING", 
+            "--line-numbers", 
+            "-n",
+        ]
         # fmt: on
-        result = subprocess.run(
-            args=command, capture_output=True, check=True, text=True
-        )
-        rules = []
-        for line in result.stdout.splitlines()[2:]:
-            if self._get_identifying_comment() in line:
-                logging.debug("Found rule: %s", line)
-                rules.append(line)
-        return [line.split()[0] for line in rules]
+        result = self._run_command(command=command)
+        needle = f"/* {self._get_identifying_comment()} */"
+        numbers = []
+        for line in cast(list[str], result.stdout.splitlines()[2:]):
+            if needle in line:
+                n = int(line.split(" ")[0])
+                formatted_line = re.sub(r"\s+", " ", line)
+                logging.debug('Found rule %d: "%s"', n, formatted_line)
+                numbers.append(n)
+        return numbers
 
     def _remove_rules(self, rule_numbers: list[int]) -> None:
         """Remove all port aliases handled by portalias"""
         for n in sorted(rule_numbers, reverse=True):
-            args = ["iptables", "-t", "nat", "-D", "PREROUTING", n]
-            logging.debug("Removing rule %d: %s", n, args)
+            command = ["iptables", "-t", "nat", "-D", "PREROUTING", str(n)]
+            logging.debug("Removing rule %d", n)
             if not self.__dry_run:
-                subprocess.run(args=args, check=True)
+                self._run_command(command=command)
 
     def _add_rule(self, protocol: str, ip_address: str, port: int, alias: int) -> None:
         # fmt: off
@@ -47,14 +94,15 @@ class IptablesService:
             "-p", protocol, 
             "-d", ip_address, 
             "--dport", str(alias), 
-            "--comment", self._get_identifying_comment(), 
             "-j", "DNAT", 
-            "--to-destination", f"{ip_address}:{port}"
+            "--to-destination", f"{ip_address}:{port}",
+            "-m", "comment",
+            "--comment", self._get_identifying_comment(), 
         ]
         # fmt: on
         logging.debug('Adding rule: "%s"', " ".join(command))
         if not self.__dry_run:
-            subprocess.run(args=command, check=True)
+            self._run_command(command=command)
 
     def _add_port_aliases(self, port_aliases: list[PortAlias]) -> None:
         """Add port aliases to iptables"""
