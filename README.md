@@ -19,14 +19,15 @@ services:
 
   portalias:
     image: ghcr.io/geoffreycoulaud/portalias:latest
-    environment:
-      - RULES_ID=test-simple
-      - LOG_LEVEL=DEBUG
+    network_mode: host
     cap_add:
       - NET_ADMIN
       - NET_RAW
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - RULES_ID=test-simple
+      - LOG_LEVEL=DEBUG
 
   web:
     image: httpd
