@@ -88,16 +88,16 @@ class IptablesService:
     def _add_rule(self, protocol: str, ip_address: str, port: int, alias: int) -> None:
         # fmt: off
         command = [
-            "iptables", 
-            "-t", "nat", 
-            "-A", "PREROUTING", 
-            "-p", protocol, 
-            "-d", ip_address, 
-            "--dport", str(alias), 
-            "-j", "REDIRECT", 
-            "--to-port", str(port),
+            "iptables",
+            "-t", "nat",
+            "-A", "PREROUTING",
+            "-p", protocol,
+            "-d", ip_address,
+            "--dport", str(alias),
+            "-j", "DNAT",
+            "--to-destination", f"{ip_address}:{port}",
             "-m", "comment",
-            "--comment", self._get_identifying_comment(), 
+            "--comment", self._get_identifying_comment(),
         ]
         # fmt: on
         logging.debug('Adding rule: "%s"', " ".join(command))
