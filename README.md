@@ -19,7 +19,6 @@ services:
 
   portalias:
     image: ghcr.io/geoffreycoulaud/portalias:latest
-    network_mode: host
     cap_add:
       - NET_ADMIN
       - NET_RAW

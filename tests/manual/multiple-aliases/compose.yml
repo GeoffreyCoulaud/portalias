@@ -15,7 +15,6 @@ services:
       - RULES_ID=test-multiple-aliases
       - DRY_RUN=true
       - LOG_LEVEL=DEBUG
-    network_mode: host
     cap_add:
       - NET_ADMIN
       - NET_RAW
