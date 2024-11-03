@@ -94,8 +94,8 @@ class IptablesService:
             "-p", protocol, 
             "-d", ip_address, 
             "--dport", str(alias), 
-            "-j", "DNAT", 
-            "--to-destination", f"{ip_address}:{port}",
+            "-j", "REDIRECT", 
+            "--to-port", str(port),
             "-m", "comment",
             "--comment", self._get_identifying_comment(), 
         ]
