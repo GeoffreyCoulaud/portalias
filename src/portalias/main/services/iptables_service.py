@@ -54,7 +54,7 @@ class IptablesService:
             )
         return result
 
-    def _get_all_rule_numbers(self) -> list[PortAlias]:
+    def _get_all_rule_numbers(self) -> list[int]:
         """Get all iptables rules handled by portalias"""
         # fmt: off
         command = [
