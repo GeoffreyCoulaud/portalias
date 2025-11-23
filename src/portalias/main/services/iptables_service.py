@@ -4,11 +4,10 @@ import subprocess
 from subprocess import CompletedProcess
 from typing import cast
 
-from portalias.models.port_alias import PortAlias
+from portalias.main.models.port_alias import PortAlias
 
 
 class IptablesService:
-
     __COMMENT_MAX_SIZE: int = 256  # Defined by iptables
     __COMMENT_PREFIX: str = "portalias."
 
