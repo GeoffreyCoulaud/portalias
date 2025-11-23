@@ -20,6 +20,6 @@ disallow_untyped_defs = true
 [dependency-groups]
 dev = [
     "mypy>=1.18.2",
-    "pylint>=4.0.3",
+    "ruff>=0.14.6",
     "types-docker>=7.1.0.20251009",
 ]
