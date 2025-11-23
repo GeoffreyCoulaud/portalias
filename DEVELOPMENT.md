@@ -1,3 +1,20 @@
+## Local setup
+
+1. [Install uv](https://docs.astral.sh/uv/getting-started/installation/)
+2. Setup the project using uv
+
+```sh
+uv sync
+```
+
+3. [Install pre-commit](https://pre-commit.com/#install)
+4. Setup pre-commit for the project
+
+```sh
+pre-commit install
+```
+
+
 ## Compiling and running locally
 
 ```sh
