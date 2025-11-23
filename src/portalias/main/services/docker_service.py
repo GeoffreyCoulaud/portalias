@@ -1,12 +1,13 @@
-from docker.client import DockerClient  # pylint: disable=import-error
-from docker.models.containers import Container  # pylint: disable=import-error
-from docker.models.networks import Network  # pylint: disable=import-error
+from typing import cast
+from docker.client import DockerClient
+from docker.models.containers import Container
+from docker.models.networks import Network
 
 from portalias.main.models.port_alias import PortAlias
 
 
 class DockerService:
-    __client: DockerClient = None
+    __client: DockerClient
 
     def _create_client(self) -> None:
         self.__client = DockerClient.from_env()
@@ -33,7 +34,10 @@ class DockerService:
         container: Container,
         network: Network,
     ) -> str:
-        return container.attrs["NetworkSettings"]["Networks"][network.name]["IPAddress"]
+        return cast(
+            str,
+            container.attrs["NetworkSettings"]["Networks"][network.name]["IPAddress"],
+        )
 
     def _get_source_port_from_label(self, label: str) -> tuple[int, list[str]]:
         parts = label.split(".")

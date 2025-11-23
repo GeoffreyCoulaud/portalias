@@ -3,7 +3,23 @@ name = "portalias"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.14"
 dependencies = [
     "docker>=7.1.0",
+]
+
+[tool.mypy]
+mypy_path = "src"
+packages = ["portalias"]
+python_version = "3.14"
+explicit_package_bases = true
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+
+[dependency-groups]
+dev = [
+    "mypy>=1.18.2",
+    "pylint>=4.0.3",
+    "types-docker>=7.1.0.20251009",
 ]
