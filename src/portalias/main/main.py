@@ -4,8 +4,8 @@ import sys
 from os import getenv
 from time import sleep
 
-from portalias.services.docker_service import DockerService
-from portalias.services.iptables_service import IptablesService
+from portalias.main.services.docker_service import DockerService
+from portalias.main.services.iptables_service import IptablesService
 
 
 def mgetenv(name: str) -> str:
@@ -17,7 +17,6 @@ def mgetenv(name: str) -> str:
 
 
 class Application:
-
     __interval: int
     __docker_service: DockerService
     __iptables_service: IptablesService

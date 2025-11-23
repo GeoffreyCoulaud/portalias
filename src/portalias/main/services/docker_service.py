@@ -2,11 +2,10 @@ from docker.client import DockerClient  # pylint: disable=import-error
 from docker.models.containers import Container  # pylint: disable=import-error
 from docker.models.networks import Network  # pylint: disable=import-error
 
-from portalias.models.port_alias import PortAlias
+from portalias.main.models.port_alias import PortAlias
 
 
 class DockerService:
-
     __client: DockerClient = None
 
     def _create_client(self) -> None:
