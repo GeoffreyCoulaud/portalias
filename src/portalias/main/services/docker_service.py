@@ -1,4 +1,5 @@
 from typing import cast
+
 from docker.client import DockerClient
 from docker.models.containers import Container
 from docker.models.networks import Network
@@ -9,12 +10,10 @@ from portalias.main.models.port_alias import PortAlias
 class DockerService:
     __client: DockerClient
 
-    def _create_client(self) -> None:
-        self.__client = DockerClient.from_env()
+    def __init__(self, client: DockerClient) -> None:
+        self.__client = client
 
     def _get_enabled_networks(self) -> list[Network]:
-        if not self.__client:
-            self._create_client()
         return self.__client.networks.list(filters={"label": "portalias.enabled=true"})
 
     def _is_container_enabled(self, container: Container) -> bool:

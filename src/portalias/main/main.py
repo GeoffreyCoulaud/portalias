@@ -4,6 +4,8 @@ import sys
 from os import getenv
 from time import sleep
 
+from docker import DockerClient
+
 from portalias.main.services.docker_service import DockerService
 from portalias.main.services.iptables_service import IptablesService
 
@@ -44,7 +46,9 @@ class Application:
         """Setup the application"""
         self._setup_logging()
         self.__interval = int(mgetenv("INTERVAL"))
-        self.__docker_service = DockerService()
+        self.__docker_service = DockerService(
+            client=DockerClient.from_env(),
+        )
         self.__iptables_service = IptablesService(
             rules_id=mgetenv("RULES_ID"),
             dry_run=getenv("DRY_RUN", "false") != "false",
