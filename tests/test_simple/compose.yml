@@ -1,0 +1,38 @@
+networks:
+  net1:
+    labels:
+      portalias.enabled: true
+  net2:
+
+services:
+  client:
+    image: alpine/curl
+    command: sleep infinity
+    container_name: client
+    networks:
+      - net1
+      - net2
+
+  server:
+    image: strm/helloworld-http
+    container_name: server
+    networks:
+      - net1
+      - net2
+    labels:
+      - portalias.8888=80
+
+  portalias:
+    image: portalias:test
+    container_name: portalias
+    network_mode: "container:client"
+    environment:
+      - RULES_ID=portalias
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    depends_on:
+      - client
+      - server
